@@ -1,6 +1,8 @@
 import { Component } from "react";
-import logo from "./logo.svg";
 import "./App.css";
+import CardList from './components/card-list/card-list.component'
+
+import SearchBox from "./components/search-box/search-box.component";
 
 class App extends Component {
   constructor() {
@@ -8,7 +10,7 @@ class App extends Component {
 
     this.state = {
       monsters: [],
-      searchString: '',
+      searchField: '',
     };
   }
   componentDidMount(){
@@ -19,38 +21,32 @@ class App extends Component {
         return {monsters: users}
       },
       ()=>{
-        console.log(this.state.monsters);
       })
     )
   };
 
+  onSearchChange = event =>{
+    // console.log(event.target.value);
+    const searchField = event.target.value.toLocaleLowerCase();
+    this.setState(()=> {
+      return { searchField };
+    })
+  }
+
   render() {
 
-    const filteredMonsters = this.state.monsters.filter((monster)=>{
-      return monster.name.toLocaleLowerCase().includes(this.state.searchString);
+    const { monsters, searchField } = this.state;
+    const { onSearchChange } = this;
+    
+    const filteredMonsters = monsters.filter((monster) =>{
+      return monster.name.toLocaleLowerCase().includes(searchField);
     });
 
     return (
       <div className='App'>
-        <input 
-        className='search-box' 
-        type='search' 
-        placeholder='search monster' 
-        onChange={(event)=>{
-          console.log(event.target.value);
-          const searchString = event.target.value.toLocaleLowerCase();
-          this.setState(()=> {
-            return { searchString };
-          })
-        }}
-        />
-        {filteredMonsters.map((monster) => {
-          return (
-            <div key={monster.id}>
-              <h1>{monster.name} </h1>
-            </div>
-          );
-        })}
+        <h1 className="app-title">Monsters Rolodex</h1>
+        <SearchBox onChangeHandler ={onSearchChange} placeholder='Search Monster' className='monsters-search-box'/>
+        <CardList monsters={filteredMonsters}/>
       </div>
     );
   }
